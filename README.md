@@ -1,8 +1,9 @@
 # 🔒 EnterpriseDocumentRedactor
 
-An AI-powered Android app that automatically detects and redacts Personally 
-Identifiable Information (PII) from documents — **100% on-device, zero network 
-calls, zero data exposure**.
+An AI-powered Android app that automatically detects and redacts Personally Identifiable Information (PII) from documents — **100% on-device, zero network calls, zero data exposure**.
+
+> 📱 Portfolio Project by **Lakshmana Reddy** | Android Tech Lead | 12 years experience
+> 📍 Pleasanton, CA | [GitHub](https://github.com/lakshmanreddymv-bot)
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-7F52FF?style=flat&logo=kotlin&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-API_26+-3DDC84?style=flat&logo=android&logoColor=white)
@@ -11,41 +12,91 @@ calls, zero data exposure**.
 ![HIPAA](https://img.shields.io/badge/HIPAA-Ready-E53935?style=flat)
 ![GDPR](https://img.shields.io/badge/GDPR-Ready-1565C0?style=flat)
 ![Room](https://img.shields.io/badge/Room-2.7.1-FF6F00?style=flat)
-![Hilt](https://img.shields.io/badge/Hilt-2.59.1-E91E63?style=flat&logo=dagger&logoColor=white)
-
-> 📱 Portfolio Project by **Lakshmana Reddy** | Android Tech Lead | 12 years experience  
-> 📍 Pleasanton, CA | [GitHub](https://github.com/lakshmanreddymv-bot)
-
----
-
-## ✨ Features
-
-- **100% On-Device AI** — ML Kit Entity Extraction + OCR runs entirely offline. No internet permission in the manifest.
-- **3-Layer PII Detection** — ML Kit → Regex → Context-aware analysis. Each layer catches what the previous misses.
-- **True PDF Redaction** — Pages rendered to Bitmap, black boxes drawn over PII bounding boxes, re-exported as image-based PDF. Copy-paste reveals nothing.
-- **11 PII Types** — Names, SSN, Credit Cards, Passports, Email, Phone, Address, DOB, Medical IDs, Financial accounts, Custom
-- **User Review & Toggle** — Red highlight overlay on document. Tap any item to keep or redact individually.
-- **Audit Trail** — Every redaction logged to Room database with timestamp, filename, and item count.
-- **Enterprise Security** — FLAG_SECURE on sensitive screens, StrictMode verifies zero network calls, R8 obfuscation enabled in release.
-- **Works in Secure Zones** — Hospitals, courtrooms, government buildings where phones cannot access the internet.
+![Hilt](https://img.shields.io/badge/Hilt-2.59.1-E91E63?style=flat)
 
 ---
 
 ## 📸 Screenshots
 
-| Home Screen | Review Screen | Result Screen | History Screen |
-|---|---|---|---|
-| Scan + file picker | PII highlighted red | Redaction stats | Audit trail |
+<div align="center">
+<table>
+  <tr>
+    <td align="center"><b>Home Screen</b></td>
+    <td align="center"><b>Camera Scan</b></td>
+    <td align="center"><b>Biometric Auth</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/Screenshot_20260423_232544.png" width="200"/></td>
+    <td><img src="screenshots/Screenshot_20260423_232727.png" width="200"/></td>
+    <td><img src="screenshots/Screenshot_20260423_232503.png" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>History Screen</b></td>
+    <td align="center"><b>Settings Screen</b></td>
+    <td align="center"><b>Redacted PDF</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/Screenshot_20260423_233017.png" width="200"/></td>
+    <td><img src="screenshots/Screenshot_20260423_230929.png" width="200"/></td>
+    <td><img src="screenshots/Screenshot_20260423_233034.png" width="200"/></td>
+  </tr>
+</table>
+</div>
+
+---
+
+## ✨ Features
+
+### 🤖 AI & Detection
+- **100% On-Device AI** — ML Kit Entity Extraction + OCR runs entirely offline. No internet permission in the manifest.
+- **3-Layer PII Detection** — ML Kit → Regex → Context-aware analysis. Each layer catches what the previous misses.
+- **11 PII Types** — Names, SSN, Credit Cards, Passports, Email, Phone, Address, DOB, Medical IDs, Financial accounts, Custom
+- **Graceful Degradation** — If ML Kit model unavailable, Regex + Context layers still run. Never shows blank results.
+
+### 📄 Document Processing
+- **True PDF Redaction** — Pages rendered to Bitmap, black boxes drawn over PII bounding boxes, re-exported as image-based PDF. Copy-paste reveals nothing underneath.
+- **Camera Scan** — ML Kit Document Scanner for physical documents
+- **File Picker** — Open existing PDFs or images from device storage
+- **User Review & Toggle** — Red highlight overlay on document. Tap any item to keep or redact individually.
+- **OOM Protection** — Large images downsampled safely before OCR using `inSampleSize` guard.
+
+### 🔒 Enterprise Security
+- **Biometric Authentication** — Fingerprint/Face ID gates access to document history. Lock screen shown on History entry.
+- **Auto-Lock Timeout** — App locks after 1/5/15 minutes in background. Configurable in Settings. `-1` = Never.
+- **Secure File Deletion** — Files overwritten with zeros before deletion. Prevents forensic recovery. HIPAA compliant.
+- **Zero Network Calls** — No INTERNET permission in manifest. StrictMode crashes debug build if network call sneaks in.
+- **FLAG\_SECURE** — ReviewScreen + ResultScreen cannot be screenshotted or screen-recorded.
+- **R8 Obfuscation** — PII detection logic not readable via jadx in release builds.
+- **No PII Logging** — Only counts logged, never actual content.
+- **No Cloud Backup** — `allowBackup=false` in manifest.
+
+### 📋 History & Audit Trail
+- **Complete Audit Log** — Every redaction logged to Room DB with filename, timestamp, and item count.
+- **Swipe to Delete** — Swipe left on any history item to delete with confirmation dialog.
+- **Delete All** — Clear entire history with one tap + confirmation.
+- **True Deletion** — Removes both Room record AND PDF file from device storage.
+- **Biometric Gate** — History screen requires biometric auth before showing documents.
+
+### ⚙️ Settings & Compliance
+- **Auto-Delete Policy** — Documents auto-deleted after 7/30/60/90 days. GDPR storage limitation compliant.
+- **Configurable Auto-Lock** — 1 min / 5 min / 15 min / Never. Persisted to SharedPreferences.
+- **Retention Policy** — Enforced on every app launch via `RetentionPolicyManager`.
+- **Cache Cleanup** — Temp files older than 24h auto-deleted on startup.
+
+### 🔄 Works Offline
+- Hospitals, courtrooms, secure government facilities — no WiFi required
+- All processing stays on-device forever after first ML Kit model download
 
 ---
 
 ## 🏗️ Architecture
 
 ### Clean Architecture — 3 Strict Layers
+
 ```
-UI Layer          →  knows only Domain (ViewModels + Use Cases)
-Domain Layer      →  knows nothing (pure Kotlin, zero Android imports)
-Data Layer        →  knows only Domain (implements interfaces)
+UI Layer     →  knows only Domain (ViewModels + Use Cases)
+Domain Layer →  knows nothing (pure Kotlin, zero Android imports)
+Data Layer   →  knows only Domain (implements interfaces)
 ```
 
 ```mermaid
@@ -53,20 +104,26 @@ graph TB
 subgraph UI["UI Layer — Jetpack Compose + MVVM"]
 HS[HomeScreen] --> HVM[HomeViewModel]
 RS[ReviewScreen] --> RVM[ReviewViewModel]
-RES[ResultScreen]
+RES[ResultScreen] --> RESVM[ResultViewModel]
 HIS[HistoryScreen] --> HIVM[HistoryViewModel]
+SS[SettingsScreen] --> SVM[SettingsViewModel]
+end
+subgraph SECURITY["Security Layer"]
+BAM[BiometricAuthManager]
+ALM[AppLockManager]
+RPM[RetentionPolicyManager]
 end
 subgraph DOMAIN["Domain Layer — Pure Kotlin"]
 SUC[ScanDocumentUseCase]
 RUC[RedactDocumentUseCase]
 GHC[GetDocumentHistoryUseCase]
 DR[DocumentRepository interface]
-MOD[Document · RedactionItem · PiiType · RedactionResult · DocumentStatus]
+MOD[Document · RedactionItem · PiiType · RedactionResult]
 end
 subgraph DATA["Data Layer — Android + ML Kit"]
 DRI[DocumentRepositoryImpl]
-PD[PiiDetector — 3-layer ML pipeline]
-DS[DocumentScanner — ML Kit OCR]
+PD[PiiDetector — 3-layer ML]
+DS[DocumentScanner — OCR]
 PR[PdfRedactor — true redaction]
 DB[Room Database]
 end
@@ -84,10 +141,14 @@ DRI --> PD
 DRI --> DS
 DRI --> PR
 DRI --> DB
-AM -.->|provides| DRI
+SVM --> ALM
+SVM --> RPM
+HIS --> BAM
+AM -.->|provides all| DRI
 style UI fill:#1a237e,color:#fff
+style SECURITY fill:#b71c1c,color:#fff
 style DOMAIN fill:#1b5e20,color:#fff
-style DATA fill:#b71c1c,color:#fff
+style DATA fill:#e65100,color:#fff
 style DI fill:#4a148c,color:#fff
 ```
 
@@ -114,17 +175,38 @@ PD->>L1: ML Kit Entity Extraction
 L1-->>PD: Names, Address, Phone, Email, Money
 PD->>L2: Regex patterns
 L2-->>PD: SSN, Credit Card, Passport, MRN, DOB
-PD->>L3: Context-aware (sliding window)
-L3-->>PD: Account numbers near "Account:", Patient IDs near "Patient:"
-PD->>PD: IoU merge — remove duplicate bounding boxes
+PD->>L3: Context-aware sliding window
+L3-->>PD: Account numbers, Patient IDs
+PD->>PD: IoU merge — deduplicate overlaps
 PD-->>VM: List of RedactionItems
 VM-->>User: ReviewScreen — red highlights
 
 User->>VM: Tap Redact
-VM->>PDF: render page to Bitmap → draw black boxes → export PDF
+VM->>PDF: render → black boxes → export image PDF
 PDF-->>VM: RedactionResult with outputPath
 VM->>DB: saveDocument for audit trail
 VM-->>User: ResultScreen — share clean PDF
+```
+
+---
+
+### 🔒 Security Architecture
+
+```mermaid
+graph LR
+USER([User opens app]) --> BIOMETRIC{Biometric\nAuth}
+BIOMETRIC -->|Pass| APP[Access Granted]
+BIOMETRIC -->|Fail| LOCK[🔒 Locked Screen]
+APP --> TIMEOUT{Background\n> timeout?}
+TIMEOUT -->|Yes| LOCK
+TIMEOUT -->|No| CONTINUE[Continue Session]
+APP --> DELETE{Delete\nDocument}
+DELETE --> OVERWRITE[Overwrite file\nwith zeros]
+OVERWRITE --> FILEDELETE[File.delete]
+FILEDELETE --> DBDELETE[Room record deleted]
+style LOCK fill:#b71c1c,color:#fff
+style APP fill:#1b5e20,color:#fff
+style OVERWRITE fill:#e65100,color:#fff
 ```
 
 ---
@@ -135,74 +217,65 @@ VM-->>User: ResultScreen — share clean PDF
 EnterpriseDocumentRedactor/
 ├── domain/                              ← Pure Kotlin, zero Android imports
 │   ├── model/
-│   │   ├── Document.kt                  # id, fileName, pageCount, status
-│   │   ├── RedactionItem.kt             # text, piiType, boundingBox, isSelected, confidence
-│   │   ├── PiiType.kt                   # 11 PII types with emoji + description
-│   │   ├── RedactionResult.kt           # outputPath, redactedByType, processingTimeMs
-│   │   └── DocumentStatus.kt           # sealed: Idle│Scanning│Detecting│Redacting│Complete│Error
+│   │   ├── Document.kt
+│   │   ├── RedactionItem.kt
+│   │   ├── PiiType.kt                   # 11 PII types
+│   │   ├── RedactionResult.kt
+│   │   └── DocumentStatus.kt           # sealed class
 │   ├── repository/
-│   │   └── DocumentRepository.kt        # Interface — scanDocument(), redactDocument(), history
+│   │   └── DocumentRepository.kt        # Interface
 │   └── usecase/
 │       ├── ScanDocumentUseCase.kt
 │       ├── RedactDocumentUseCase.kt
 │       └── GetDocumentHistoryUseCase.kt
 │
-├── data/                               ← Android + ML Kit implementations
+├── data/
 │   ├── ml/
 │   │   ├── PiiDetector.kt              # 3-layer detection + IoU merge
-│   │   ├── DocumentScanner.kt          # ML Kit OCR — image + PDF support
-│   │   └── ModelDownloadHelper.kt      # ML Kit model download state
+│   │   ├── DocumentScanner.kt          # ML Kit OCR + OOM guard
+│   │   └── ModelDownloadHelper.kt      # Download state + 30s timeout
 │   ├── pdf/
-│   │   └── PdfRedactor.kt              # True redaction — renders to Bitmap, removes text layer
+│   │   └── PdfRedactor.kt              # True redaction — removes text layer
 │   ├── local/
-│   │   ├── DocumentDatabase.kt         # Room database
-│   │   ├── DocumentDao.kt              # insert, getAll, Flow<List>
-│   │   └── DocumentEntity.kt           # Room entity
+│   │   ├── DocumentDatabase.kt
+│   │   ├── DocumentDao.kt
+│   │   └── DocumentEntity.kt
 │   └── repository/
-│       └── DocumentRepositoryImpl.kt   # Coordinates ML Kit + Room + PdfRedactor
+│       └── DocumentRepositoryImpl.kt   # secureDelete() included
+│
+├── security/                           ← Enterprise security layer
+│   ├── BiometricAuthManager.kt         # Fingerprint/Face ID + status enum
+│   ├── AppLockManager.kt               # Auto-lock + configurable timeout
+│   └── RetentionPolicyManager.kt       # Auto-delete old documents
 │
 ├── di/
-│   └── AppModule.kt                    # Hilt: @Singleton PiiDetector, DocumentScanner, Room
+│   └── AppModule.kt
 │
 ├── ui/
 │   ├── home/
-│   │   ├── HomeScreen.kt               # Camera scan + file picker entry points
+│   │   ├── HomeScreen.kt               # Camera scan + file picker + settings icon
 │   │   └── HomeViewModel.kt
 │   ├── review/
 │   │   ├── ReviewScreen.kt             # PII highlights + toggle + category chips
 │   │   ├── ReviewViewModel.kt
 │   │   └── RedactionUiState.kt
 │   ├── result/
-│   │   └── ResultScreen.kt             # Stats + share redacted PDF
+│   │   ├── ResultScreen.kt             # Stats + share redacted PDF
+│   │   └── ResultViewModel.kt          # Extracted to own file
 │   ├── history/
-│   │   ├── HistoryScreen.kt            # Audit trail — all past redactions
+│   │   ├── HistoryScreen.kt            # Swipe-to-delete + biometric gate
 │   │   └── HistoryViewModel.kt
+│   ├── settings/
+│   │   ├── SettingsScreen.kt           # Security + retention UI
+│   │   └── SettingsViewModel.kt        # Persists to SharedPreferences
 │   └── components/
-│       ├── PiiHighlightOverlay.kt      # Canvas — red/gray boxes, tappable
-│       ├── CategorySummaryChip.kt      # Emoji + PII type + count chip
-│       └── RedactionSummaryCard.kt     # Final stats card
+│       ├── PiiHighlightOverlay.kt
+│       ├── CategorySummaryChip.kt
+│       └── RedactionSummaryCard.kt
 │
-├── EnterpriseDocumentRedactorApp.kt    # @HiltAndroidApp + eager ML Kit init
-└── MainActivity.kt                     # NavHost — home, review, result, history
+├── EnterpriseDocumentRedactorApp.kt    # Lifecycle observer + retention + cache cleanup
+└── MainActivity.kt                     # Lock screen + NavHost (5 routes)
 ```
-
----
-
-### 🔄 Unidirectional Data Flow (UDF)
-
-```mermaid
-graph LR
-TAP([User Action]) --> EV[ViewModel handles event]
-EV --> UC[Use Case]
-UC --> REPO[Repository]
-REPO -->|Result| ST[StateFlow emit]
-ST --> UI[Screen recomposes]
-style TAP fill:#e65100,color:#fff
-style UC fill:#2e7d32,color:#fff
-style UI fill:#1565c0,color:#fff
-```
-
-**Pattern:** Clean Architecture + MVVM + Unidirectional Data Flow. Screens are pure functions of their state — zero business logic in composables.
 
 ---
 
@@ -210,7 +283,7 @@ style UI fill:#1565c0,color:#fff
 
 | Layer | Technology |
 |---|---|
-| Language | Kotlin |
+| Language | Kotlin 2.2.10 |
 | UI | Jetpack Compose + Material3 |
 | Architecture | Clean Architecture + MVVM + UDF |
 | DI | Hilt 2.59.1 |
@@ -219,10 +292,11 @@ style UI fill:#1565c0,color:#fff
 | PII Detection | ML Kit Entity Extraction 16.0.0-beta5 |
 | PDF Redaction | Android PdfRenderer + PdfDocument API |
 | Database | Room 2.7.1 |
+| Biometric | AndroidX Biometric 1.1.0 |
 | Image Loading | Coil 2.7.0 |
 | Navigation | Navigation Compose 2.8.9 |
-| Async | Coroutines + StateFlow |
-| Build | AGP 9.x, Kotlin 2.2.10, KSP 2.2.10-2.0.2, compileSdk 36 |
+| Async | Coroutines + StateFlow + SharedFlow |
+| Build | AGP 9.x, KSP 2.2.10-2.0.2, compileSdk 36 |
 
 ---
 
@@ -234,255 +308,151 @@ style UI fill:#1565c0,color:#fff
 - Android device/emulator with Google Play Services (API 26+)
 - **No API keys required** — 100% on-device ML Kit
 
-### 1. Clone the repository
+### Clone & Run
 
 ```bash
 git clone https://github.com/lakshmanreddymv-bot/EnterpriseDocumentRedactor.git
 cd EnterpriseDocumentRedactor
-```
-
-### 2. Build & Run
-
-```bash
 ./gradlew assembleDebug
 ```
 
-Or open in Android Studio → Run ▶️
-
-> **Important:** Use a Google Play emulator (not plain AOSP) so ML Kit Entity Extraction model can download on first launch. After the first run, the app works fully offline.
+> **Important:** Use a Google Play emulator (not plain AOSP). After first launch ML Kit model downloads once — then works fully offline forever.
 
 ---
 
-## 📋 Permissions Required
+## 📋 Permissions
 
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.USE_BIOMETRIC" />
+<uses-permission android:name="android.permission.USE_FINGERPRINT" />
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
     android:maxSdkVersion="32" />
-<uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
-    android:minSdkVersion="33" />
+<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 <!-- NO INTERNET PERMISSION — by design -->
 ```
-
-**Zero internet permission** — this is the core enterprise selling point. StrictMode in debug builds crashes the app if any network call is accidentally introduced.
 
 ---
 
 ## 🔒 Security Architecture
 
-| Feature | Implementation |
-|---|---|
-| Zero network | No INTERNET permission in manifest |
-| Network verification | StrictMode.ThreadPolicy in debug — crashes on any network call |
-| Screen protection | FLAG_SECURE on ReviewScreen + ResultScreen — no screenshots or screen recording |
-| Release obfuscation | R8 minification enabled — PII detection logic not readable via jadx |
-| No PII logging | Only counts logged, never actual text content |
-| No cloud backup | allowBackup=false in manifest |
+| Feature | Implementation | Standard |
+|---|---|---|
+| Zero network | No INTERNET permission in manifest | HIPAA, GDPR |
+| Network verification | StrictMode crashes on any network call in debug | Dev safety |
+| Screen protection | FLAG_SECURE on Review + Result screens | HIPAA |
+| Biometric lock | AndroidX BiometricPrompt — BIOMETRIC_STRONG | HIPAA access control |
+| Auto-lock timeout | Configurable: 1/5/15 min / Never, persisted to prefs | HIPAA |
+| Secure deletion | Overwrite with zeros (64KB chunks) → File.delete() | HIPAA forensics |
+| DB backup disabled | allowBackup=false in manifest | GDPR |
+| Release obfuscation | R8 minification enabled | Security |
+| No PII logging | Counts only, never text content | HIPAA |
+| Data retention | Auto-delete after 7/30/60/90 days on launch | GDPR Art.5 |
+| Audit trail | Timestamped Room DB log per redaction | HIPAA audit |
 
 ---
 
 ## 🧪 PII Detection — 11 Types Across 3 Layers
 
-| Layer | Method | PII Types Detected |
+| Layer | Method | Detects |
 |---|---|---|
-| Layer 1 | ML Kit Entity Extraction | 👤 Person Name, 📍 Address, 📞 Phone, 📧 Email, 💰 Financial |
-| Layer 2 | Precompiled Regex | 🔒 SSN, 💳 Credit Card, 🛂 Passport, 🏥 Medical Record Number, 📅 Date of Birth |
-| Layer 3 | Context-aware (60-char window) | 💰 Account numbers near "Account:", 🏥 Patient IDs near "Patient:" |
+| Layer 1 | ML Kit Entity Extraction | 👤 Name, 📍 Address, 📞 Phone, 📧 Email, 💰 Financial |
+| Layer 2 | Precompiled Regex | 🔒 SSN, 💳 Credit Card, 🛂 Passport, 🏥 MRN, 📅 DOB |
+| Layer 3 | Context-aware (60-char window) | 💰 Account numbers, 🏥 Patient IDs |
 
-**Overlap resolution:** Intersection-over-Union (IoU > 0.3) merges duplicate detections across layers. Highest-confidence detection wins.
+**Overlap resolution:** IoU > 0.3 merges duplicates. Highest confidence wins.
 
-**Graceful degradation:** If ML Kit model is unavailable (no Play Services), Layer 2 + Layer 3 still run. The app never shows a blank result.
+**Graceful degradation:** Layers 2+3 always run — even without Play Services.
 
 ---
 
 ## 📱 Real-World Use Cases
 
-### Use Case 1: Legal Firm — Discovery Document Sharing
+### Legal Firm — Discovery Documents
+
 ```
-Document: 20-page contract with client details
-Detected: John Smith (PERSON), 123-45-6789 (SSN), john@firm.com (EMAIL),
-          Account: 9876543210 (FINANCIAL), 415-555-0192 (PHONE)
-Redacted: 5 items → 5 black boxes applied
-Result:   Clean PDF shared with opposing counsel — GDPR compliant
+Input:  20-page contract
+Found:  Name, SSN, Email, Account number, Phone
+Result: Clean PDF → opposing counsel — GDPR compliant
 ```
 
-### Use Case 2: Hospital — Patient Record De-identification
+### Hospital — Patient De-identification
+
 ```
-Document: Patient intake form
-Detected: Jane Doe (PERSON), 04/15/1982 (DOB), MRN-789012 (MEDICAL),
-          Blue Shield Policy 445566 (FINANCIAL), jane@gmail.com (EMAIL)
-Redacted: 5 items → all 5 HIPAA identifiers removed
-Result:   Anonymous record sent to research team — HIPAA Safe Harbor compliant
+Input:  Patient intake form
+Found:  Name, DOB, MRN, Insurance policy, Email
+Result: Anonymous record → research team — HIPAA Safe Harbor
 ```
 
-### Use Case 3: Driving Licence — Personal Privacy
+### Personal — Driving Licence
+
 ```
-Document: Driving licence scan
-Detected: Full name (PERSON), Date of birth (DOB),
-          Home address (ADDRESS), Licence number (CUSTOM)
-Redacted: 4 items blacked out
-Result:   Safe to email to insurance company — only photo and expiry visible
+Input:  Driving licence scan
+Found:  Full name, DOB, Address, Licence number
+Result: Safe to email to insurance — only photo visible
 ```
 
-### Use Case 4: Bank — Audit Report Preparation
+### Bank — Audit Preparation
+
 ```
-Document: Customer loan application
-Detected: 4111-1111-1111-1111 (CREDIT_CARD), 987-65-4320 (SSN),
-          Account: 00123456789 (FINANCIAL)
-Redacted: 3 items → PCI-DSS compliant version
-Result:   Safe to share with external auditor
+Input:  Loan application
+Found:  Credit card, SSN, Account number
+Result: PCI-DSS compliant version → auditor
 ```
 
 ---
 
-## 🐛 Issues Faced & How We Solved Them
+## 🐛 Issues Faced & Fixed
 
-### Issue 1: ML Kit Model Download Fails — "Something went wrong"
-
-**Problem:** First launch shows "Downloading..." → "Something went wrong. Try again later."  
-**Root Cause:** Plain AOSP emulator has no Google Play Services. ML Kit Entity Extraction requires Play Services for model download.  
-**Fix:** Switch to Google Play emulator in AVD Manager. Added `ModelDownloadHelper` with download progress StateFlow. Added banner in HomeScreen: "ML Kit downloading — using regex mode". Regex + context layers still run during download.
-
----
-
-### Issue 2: Bitmap Memory Leak — OOM on Multi-Page PDFs
-
-**Problem:** 10-page PDF scan caused OutOfMemoryError on real devices. Each page bitmap (~7.3MB) was never recycled.  
-**Root Cause:** `DocumentRepositoryImpl` only used `page.ocrText` and silently dropped `page.bitmap`. Native bitmap memory is not GC'd.  
-**Fix:** Added `.also { it.bitmap?.recycle() }` after each page's OCR. Added `onCleared()` in `ReviewViewModel` to recycle the last page bitmap.
-
-```kotlin
-return pages.flatMap { page ->
-    piiDetector.detect(page.ocrText, page.pageIndex).also { page.bitmap?.recycle() }
-}
-```
-
----
-
-### Issue 3: PdfDocument Native Leak on Exception
-
-**Problem:** Any exception during redaction left the native PDF context open permanently.  
-**Root Cause:** `pdfDoc.close()` was only called on the success path.  
-**Fix:** Wrapped entire `PdfDocument` usage in try-finally.
-
-```kotlin
-val pdfDoc = PdfDocument()
-try {
-    // ... render + draw + write
-} finally {
-    pdfDoc.close()
-}
-```
-
----
-
-### Issue 4: CancellationException Swallowed — Coroutines Broken
-
-**Problem:** User exits scan screen mid-scan — ML Kit keeps running in background forever.  
-**Root Cause:** `catch (e: Exception)` swallows `CancellationException` which is a subclass of Exception. Cooperative coroutine cancellation breaks.  
-**Fix:** Rethrow `CancellationException` before any other handling.
-
-```kotlin
-} catch (e: Exception) {
-    if (e is CancellationException) throw e
-    Log.w(TAG, "ML Kit annotation failed: ${e.javaClass.simpleName}")
-    return emptyList()
-}
-```
-
----
-
-### Issue 5: Unsafe Activity Cast — ClassCastException in Compose
-
-**Problem:** `context as Activity` crashes in Compose previews and wrapped contexts. Flagged by Android Lint.  
-**Fix:** Added `findActivity()` extension that walks the ContextWrapper chain safely.
-
-```kotlin
-fun Context.findActivity(): Activity? {
-    var ctx = this
-    while (ctx is ContextWrapper) {
-        if (ctx is Activity) return ctx
-        ctx = ctx.baseContext
-    }
-    return null
-}
-```
-
----
-
-### Issue 6: Gradle Build Failures — Version Conflicts
-
-**Problem:** Multiple dependency version conflicts on AGP 9.x + Kotlin 2.2.10.  
-**Fixes applied:**
-
-| Issue | Fix |
-|---|---|
-| KSP version mismatch | 2.2.10-1.0.29 → 2.2.10-2.0.2 |
-| Hilt "BaseExtension not found" on AGP 9.x | 2.52 → 2.59.1 |
-| Room "unexpected jvm signature" on suspend funs | 2.6.1 → 2.7.1 |
-| kotlin-android plugin conflict in Kotlin 2.x | Removed — use kotlin.compose only |
-| activity:1.13.0 requires API 36 | compileSdk 26 → 36 |
-| KSP + AGP 9.x source set issue | android.disallowKotlinSourceSets=false |
-
----
-
-### Issue 7: isMinifyEnabled = false in Release
-
-**Problem:** Entire PII detection logic, all regex patterns, and ML Kit integration readable in APK via jadx. Unacceptable for enterprise security product.  
-**Fix:** Enabled R8 + isShrinkResources in release. Added ML Kit, Hilt, Room, and Coroutines ProGuard rules to proguard-rules.pro.
+| # | Problem | Root Cause | Fix |
+|---|---|---|---|
+| 1 | ML Kit "Something went wrong" | Plain AOSP emulator, no Play Services | Switch to Google Play emulator + ModelDownloadHelper fallback |
+| 2 | OOM on multi-page PDF | 10 pages × 7.3MB bitmaps never recycled | bitmap.recycle() after OCR + onCleared() in ReviewViewModel |
+| 3 | PdfDocument native leak | close() only on success path | try-finally around pdfDoc.close() |
+| 4 | Coroutine cancellation broken | CancellationException swallowed in catch(Exception) | Rethrow CancellationException first |
+| 5 | ClassCastException in Compose | context as Activity unsafe cast | findActivity() extension walking ContextWrapper chain |
+| 6 | Gradle version conflicts | AGP 9.x + Kotlin 2.2.10 incompatibilities | KSP 2.0.2, Hilt 2.59.1, Room 2.7.1, compileSdk 36 |
+| 7 | R8 disabled in release | isMinifyEnabled = false | Enabled R8 + ProGuard rules for ML Kit/Hilt/Room |
+| 8 | Settings not persisting across launches | No SharedPreferences — in-memory only | SettingsViewModel with full SharedPreferences persistence |
+| 9 | Large image OOM in scanImage() | No inSampleSize on BitmapFactory | calculateInSampleSize() guard + RGB_565 config before decode |
+| 10 | Encrypted PDF cryptic crash | SecurityException not caught specifically | Catch SecurityException → "This PDF is password-protected" message |
 
 ---
 
 ## 🗺️ Roadmap
 
+- [ ] SQLCipher — AES-256 Room database encryption
+- [ ] Tamper-proof audit log with SHA-256 hashing
 - [ ] Multi-language PII detection (Spanish, French, German)
-- [ ] Batch document processing — multiple files at once
-- [ ] Custom PII rules — user-defined patterns
+- [ ] Batch document processing
 - [ ] Password-protected PDF support
-- [ ] Export redaction report as compliance certificate
-- [ ] Biometric authentication before viewing History
+- [ ] Export compliance certificate PDF
+- [ ] Custom PII rules — user-defined regex patterns
 
 ---
 
-## 🤝 Part of AI Android Portfolio
-
-This is **Project 3** in a series of AI-powered Android apps:
+## 🤝 AI Android Portfolio
 
 | # | Project | Status | Description |
 |---|---|---|---|
 | 1 | [MySampleApplication-AI](https://github.com/lakshmanreddymv-bot/MySampleApplication-AI) | ✅ Complete | AI Natural Language Search — Gemini API |
-| 2 | [FakeProductDetector](https://github.com/lakshmanreddymv-bot/FakeProductDetector) | ✅ Complete | Dual-AI product authentication — Gemini + Claude |
-| 3 | **EnterpriseDocumentRedactor** | ✅ Complete | On-device PII redaction — 100% offline ML Kit |
-| 4 | Coming Soon | 🔨 Planning | ... |
+| 2 | [FakeProductDetector](https://github.com/lakshmanreddymv-bot/FakeProductDetector) | ✅ Complete | Dual-AI authentication — Gemini + Claude |
+| 3 | **EnterpriseDocumentRedactor** | ✅ Complete | On-device PII redaction — 100% offline |
+| 4 | Coming Soon | 🔨 Planning | — |
 
 ---
 
 ## 📄 License
 
-```
-MIT License
-Copyright (c) 2026 Lakshmana Reddy
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
-```
+MIT License — Copyright (c) 2026 Lakshmana Reddy
 
 ---
 
 ## 👨‍💻 Author
 
-**Lakshmana Reddy**  
-Android Tech Lead | 12 years experience  
-📍 Pleasanton, CA  
+**Lakshmana Reddy**
+Android Tech Lead | 12 years experience
+📍 Pleasanton, CA
 🔗 [GitHub](https://github.com/lakshmanreddymv-bot)
 
 ---
