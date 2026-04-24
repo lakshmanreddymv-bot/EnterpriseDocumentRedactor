@@ -9,16 +9,25 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+enum class BiometricStatus { AVAILABLE, NO_HARDWARE, NONE_ENROLLED, OTHER_ERROR }
+
 @Singleton
 class BiometricAuthManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    fun isBiometricAvailable(): Boolean {
-        val biometricManager = BiometricManager.from(context)
-        return biometricManager.canAuthenticate(
+    fun isBiometricAvailable(): Boolean = getStatus() == BiometricStatus.AVAILABLE
+
+    fun getStatus(): BiometricStatus {
+        val result = BiometricManager.from(context).canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_STRONG or
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL
-        ) == BiometricManager.BIOMETRIC_SUCCESS
+        )
+        return when (result) {
+            BiometricManager.BIOMETRIC_SUCCESS -> BiometricStatus.AVAILABLE
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> BiometricStatus.NO_HARDWARE
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> BiometricStatus.NONE_ENROLLED
+            else -> BiometricStatus.OTHER_ERROR
+        }
     }
 
     fun authenticate(

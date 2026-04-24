@@ -1,5 +1,6 @@
 package com.example.enterprisedocumentredactor.ui.settings
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.enterprisedocumentredactor.security.BiometricStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +45,9 @@ fun SettingsScreen(
 ) {
     val biometricEnabled by viewModel.biometricEnabled.collectAsState()
     val lockTimeoutMinutes by viewModel.lockTimeoutMinutes.collectAsState()
+    val retentionDays by viewModel.retentionDays.collectAsState()
     val showDeleteAllDialog by viewModel.showDeleteAllDialog.collectAsState()
+    val biometricStatus = viewModel.biometricStatus
 
     if (showDeleteAllDialog) {
         AlertDialog(
@@ -84,17 +88,28 @@ fun SettingsScreen(
             SectionHeader("Security")
 
             SettingsCard {
+                // Biometric description depends on hardware state (Bug 4)
+                val biometricDescription = when (biometricStatus) {
+                    BiometricStatus.NO_HARDWARE ->
+                        "No biometric hardware available on this device.\n" +
+                        "On a real device, fingerprint or face ID will be used."
+                    BiometricStatus.NONE_ENROLLED ->
+                        "No fingerprint or face ID enrolled.\n" +
+                        "Go to device Settings → Security to add one."
+                    BiometricStatus.AVAILABLE ->
+                        "Require fingerprint or face ID to access history"
+                    BiometricStatus.OTHER_ERROR ->
+                        "Biometric authentication unavailable"
+                }
+
                 SettingsRow(
                     label = "Biometric Lock",
-                    description = if (viewModel.isBiometricAvailable)
-                        "Require fingerprint or face to view history"
-                    else
-                        "No biometric hardware available"
+                    description = biometricDescription
                 ) {
                     Switch(
                         checked = biometricEnabled,
                         onCheckedChange = { viewModel.setBiometricEnabled(it) },
-                        enabled = viewModel.isBiometricAvailable
+                        enabled = biometricStatus == BiometricStatus.AVAILABLE
                     )
                 }
 
@@ -107,7 +122,12 @@ fun SettingsScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
-                val timeoutOptions = listOf(1 to "1 minute", 5 to "5 minutes", 15 to "15 minutes", -1 to "Never")
+                val timeoutOptions = listOf(
+                    1 to "1 minute",
+                    5 to "5 minutes",
+                    15 to "15 minutes",
+                    -1 to "Never"
+                )
                 timeoutOptions.forEach { (minutes, label) ->
                     OptionRow(
                         label = label,
@@ -135,11 +155,17 @@ fun SettingsScreen(
                 )
                 Spacer(Modifier.height(4.dp))
 
-                val retentionOptions = listOf(7 to "7 days", 30 to "30 days", 60 to "60 days", 90 to "90 days", -1 to "Never (keep forever)")
+                val retentionOptions = listOf(
+                    7 to "7 days",
+                    30 to "30 days",
+                    60 to "60 days",
+                    90 to "90 days",
+                    -1 to "Never (keep forever)"
+                )
                 retentionOptions.forEach { (days, label) ->
                     OptionRow(
                         label = label,
-                        selected = viewModel.retentionDays == days,
+                        selected = retentionDays == days,
                         onClick = { viewModel.setRetentionDays(days) }
                     )
                 }
@@ -165,7 +191,7 @@ fun SettingsScreen(
                         onClick = { viewModel.requestDeleteAll() },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
                     ) {
                         Text("Delete All Documents Now")
                     }
