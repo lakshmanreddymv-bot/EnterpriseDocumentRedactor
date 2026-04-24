@@ -10,4 +10,7 @@ interface DocumentRepository {
     suspend fun redactDocument(documentId: String, items: List<RedactionItem>, sourcePath: String): RedactionResult
     fun getDocumentHistory(): Flow<List<Document>>
     suspend fun saveDocument(document: Document)
+    suspend fun deleteDocument(id: String)
+    suspend fun deleteAll()
+    suspend fun deleteOlderThan(cutoffMs: Long)
 }

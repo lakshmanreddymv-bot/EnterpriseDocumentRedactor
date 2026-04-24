@@ -20,6 +20,8 @@ mlkitDocumentScanner = "16.0.0-beta1"
 cameraX = "1.3.4"
 coroutines = "1.8.1"
 coil = "2.7.0"
+biometric = "1.1.0"
+lifecycleProcess = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +56,8 @@ camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = 
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

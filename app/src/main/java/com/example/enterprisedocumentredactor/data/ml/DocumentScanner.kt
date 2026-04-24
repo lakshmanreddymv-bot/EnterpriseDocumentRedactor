@@ -61,14 +61,37 @@ class DocumentScanner @Inject constructor(
     }
 
     private suspend fun scanImage(file: File): List<ScanPageResult> {
-        val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+        // Q6: OOM guard — sample down large images before decoding
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.absolutePath, options)
+        options.inSampleSize = calculateInSampleSize(options, 1920, 1920)
+        options.inJustDecodeBounds = false
+        options.inPreferredConfig = Bitmap.Config.RGB_565
+
+        val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
             ?: return emptyList()
         val ocrText = runOcr(bitmap)
         return listOf(ScanPageResult(0, ocrText, bitmap))
+    }
+
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val (height, width) = options.outHeight to options.outWidth
+        var inSampleSize = 1
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
     }
 
     private suspend fun runOcr(bitmap: Bitmap): Text {
         val image = InputImage.fromBitmap(bitmap, 0)
         return recognizer.process(image).await()
     }
+
+    // M8: release TextRecognizer resources when no longer needed
+    fun close() = recognizer.close()
 }

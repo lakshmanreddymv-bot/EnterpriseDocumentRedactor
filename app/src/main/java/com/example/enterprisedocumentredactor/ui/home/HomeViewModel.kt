@@ -46,8 +46,17 @@ class HomeViewModel @Inject constructor(
             try {
                 _status.value = DocumentStatus.Detecting
                 val items = scanDocumentUseCase(filePath)
-                val documentId = UUID.randomUUID().toString()
 
+                // Q1: reject empty documents before entering review
+                if (items.isEmpty()) {
+                    _status.value = DocumentStatus.Error(
+                        "No text could be extracted from this document. " +
+                        "The file may be empty, image-only without OCR support, or password-protected."
+                    )
+                    return@launch
+                }
+
+                val documentId = UUID.randomUUID().toString()
                 sessionCache.setSession(
                     documentId = documentId,
                     filePath = filePath,
@@ -55,6 +64,11 @@ class HomeViewModel @Inject constructor(
                     items = items
                 )
                 _status.value = DocumentStatus.Detected(items)
+            } catch (e: SecurityException) {
+                // Q7: encrypted/password-protected PDFs throw SecurityException
+                _status.value = DocumentStatus.Error(
+                    "This PDF is password-protected. Please provide an unlocked copy."
+                )
             } catch (e: Exception) {
                 _status.value = DocumentStatus.Error(e.message ?: "Scan failed")
             }

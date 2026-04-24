@@ -8,10 +8,12 @@ import com.google.mlkit.nl.entityextraction.EntityExtraction
 import com.google.mlkit.nl.entityextraction.EntityExtractor
 import com.google.mlkit.nl.entityextraction.EntityExtractorOptions
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,15 +55,26 @@ class ModelDownloadHelper @Inject constructor(
             val extractor = EntityExtraction.getClient(
                 EntityExtractorOptions.Builder(EntityExtractorOptions.ENGLISH).build()
             )
-            extractor.downloadModelIfNeeded().await()
+            // Q2: cap model download at 30 seconds to avoid hanging indefinitely on slow connections
+            withTimeout(30_000L) {
+                extractor.downloadModelIfNeeded().await()
+            }
             entityExtractor = extractor
             _isModelReady.value = true
             _downloadProgress.value = "ML Kit model ready"
             Log.i(TAG, "Entity extraction model downloaded and ready")
+        } catch (e: TimeoutCancellationException) {
+            Log.w(TAG, "Entity extraction model download timed out — regex mode active")
+            _downloadProgress.value = "ML Kit download timed out — regex mode active"
         } catch (e: Exception) {
             Log.w(TAG, "Entity extraction model download failed (${e.javaClass.simpleName}) — regex mode active")
             _downloadProgress.value = "ML Kit unavailable — regex mode active"
-            // Do not crash — regex + context layers will handle detection
         }
+    }
+
+    // M8: release EntityExtractor resources when no longer needed
+    fun close() {
+        entityExtractor?.close()
+        entityExtractor = null
     }
 }

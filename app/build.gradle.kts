@@ -83,6 +83,12 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Biometric
+    implementation(libs.biometric)
+
+    // Lifecycle Process (ProcessLifecycleOwner)
+    implementation(libs.lifecycle.process)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
