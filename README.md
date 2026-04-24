@@ -4,7 +4,16 @@ An AI-powered Android app that automatically detects and redacts Personally
 Identifiable Information (PII) from documents — **100% on-device, zero network 
 calls, zero data exposure**.
 
-> 📱 Portfolio Project by **Lakshmana Reddy** | Android Tech Lead | 12 years experience
+![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-7F52FF?style=flat&logo=kotlin&logoColor=white)
+![Android](https://img.shields.io/badge/Android-API_26+-3DDC84?style=flat&logo=android&logoColor=white)
+![ML Kit](https://img.shields.io/badge/ML_Kit-On--Device-4285F4?style=flat&logo=google&logoColor=white)
+![Zero Network](https://img.shields.io/badge/Network-Zero_Calls-FF6B35?style=flat)
+![HIPAA](https://img.shields.io/badge/HIPAA-Ready-E53935?style=flat)
+![GDPR](https://img.shields.io/badge/GDPR-Ready-1565C0?style=flat)
+![Room](https://img.shields.io/badge/Room-2.7.1-FF6F00?style=flat)
+![Hilt](https://img.shields.io/badge/Hilt-2.59.1-E91E63?style=flat&logo=dagger&logoColor=white)
+
+> 📱 Portfolio Project by **Lakshmana Reddy** | Android Tech Lead | 12 years experience  
 > 📍 Pleasanton, CA | [GitHub](https://github.com/lakshmanreddymv-bot)
 
 ---
