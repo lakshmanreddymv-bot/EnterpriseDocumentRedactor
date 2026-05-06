@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    id("jacoco")
 }
 
 android {
@@ -21,6 +22,7 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
+            enableUnitTestCoverage = true   // JaCoCo instrumentation for unit tests
         }
         release {
             isMinifyEnabled = true
@@ -41,7 +43,84 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions {
+        unitTests {
+            // Allow Android stubs to return defaults (0/null/false) instead of throwing.
+            // Required so RectF, Log, etc. work in pure-JVM unit tests without Robolectric.
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
+    }
 }
+
+// ── JaCoCo ──────────────────────────────────────────────────────────────────
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+val jacocoExcludes = listOf(
+    // Android / Compose boilerplate
+    "**/R.class", "**/R\$*.class", "**/BuildConfig.*", "**/Manifest*.*",
+    // Hilt generated
+    "**/*Hilt*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
+    "**/Dagger*Component*.*", "**/di/**",
+    // UI — Composables, Screens, Themes (tested via instrumented tests, not unit tests)
+    "**/*Screen*.*", "**/*Activity*.*", "**/*Theme*.*",
+    "**/*Color*.*", "**/*Type*.*", "**/*Component*.*",
+    // Room generated
+    "**/*_Impl*.*",
+    // Pure data models / enums
+    "**/model/**"
+)
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    group = "verification"
+    description = "JaCoCo unit-test coverage report — debug build."
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val classesDir = layout.buildDirectory.dir("tmp/kotlin-classes/debug")
+    classDirectories.setFrom(fileTree(classesDir) { exclude(jacocoExcludes) })
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        }
+    )
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
+    group = "verification"
+    description = "Fail the build if line coverage < 80% (HIPAA/GDPR compliance target)."
+    dependsOn("jacocoTestReport")
+
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                value   = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+
+    val classesDir = layout.buildDirectory.dir("tmp/kotlin-classes/debug")
+    classDirectories.setFrom(fileTree(classesDir) { exclude(jacocoExcludes) })
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        }
+    )
+}
+
+// ── Dependencies ─────────────────────────────────────────────────────────────
 
 dependencies {
     implementation(libs.androidx.core.ktx)
@@ -89,7 +168,12 @@ dependencies {
     // Lifecycle Process (ProcessLifecycleOwner)
     implementation(libs.lifecycle.process)
 
+    // ── Unit Tests ───────────────────────────────────────────────────────────
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.arch.testing)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
